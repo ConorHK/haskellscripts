@@ -3,6 +3,7 @@
 
 import System.Environment (getArgs)
 import Data.List (isInfixOf)
+import System.Exit (exitSuccess, exitFailure)
 
 -- Function to check if substring exists in string
 contains :: String -> String -> Bool
@@ -14,6 +15,7 @@ main = do
     case args of
         [str, subStr] -> 
             if contains str subStr
-            then putStrLn "Substring found"
-            else putStrLn "Substring not found"
-        _ -> putStrLn "Usage: provide two arguments (string and substring)"
+            then exitSuccess
+            else exitFailure
+        _ -> do putStrLn "Usage: provide two arguments (string and substring)"
+                exitFailure
