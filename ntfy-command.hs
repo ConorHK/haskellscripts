@@ -13,17 +13,15 @@ import Control.Exception (catch)
 import Network.HTTP.Simple (httpNoBody, setRequestBodyJSON, setRequestMethod, setRequestPath, defaultRequest, setRequestHost)
 import qualified Data.Aeson as Aeson
 import qualified Data.ByteString.Char8 as BS
-import qualified Data.Text as T  -- Import Data.Text
-import qualified Data.Text.Encoding as TE  -- Import Data.Text.Encoding
+import qualified Data.Text as T
+import qualified Data.Text.Encoding as TE
 
--- Default priorities
 defaultSuccessPriority :: Int
 defaultSuccessPriority = 3
 
 defaultFailurePriority :: Int
 defaultFailurePriority = 4
 
--- Function to send notifications
 sendNotification :: String -> Int -> Bool -> DiffTime -> IO ()
 sendNotification command priority isError execTime = do
     let topic = "foo"
@@ -45,19 +43,15 @@ sendNotification command priority isError execTime = do
     _ <- httpNoBody request
     return ()
 
--- Main function
 main :: IO ()
 main = do
-    -- Get command-line arguments
     args <- getArgs
     let command = unwords args
 
-    -- Get environment variables with fallback
     successPriority <- fmap (read . fromMaybe (show defaultSuccessPriority)) (lookupEnv "SUCCESS_PRIORITY")
     failurePriority <- fmap (read . fromMaybe (show defaultFailurePriority)) (lookupEnv "FAILURE_PRIORITY")
     alias <- lookupEnv "ALIAS"
 
-    -- Time command execution
     start <- getTime Monotonic
     (_, _, _, handle) <- createProcess (proc (head args) (tail args))
     exitCode <- waitForProcess handle
@@ -70,5 +64,4 @@ main = do
             _           -> True
         priority = if isError then failurePriority else successPriority
 
-    -- Send notification
     sendNotification commandString priority isError execTime
